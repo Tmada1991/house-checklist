@@ -3,789 +3,1214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>戸建て最終内覧会チェックリスト</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <title>戸建て内覧会チェックリスト（完全版）</title>
     <style>
-         {
-            body { font-size: 12px; }
-            .no-print { display: none !important; }
-            .print-break { page-break-inside: avoid; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
-        .priority-high { border-left: 4px solid #ef4444; background: #fef2f2; }
-        .priority-medium { border-left: 4px solid #f59e0b; background: #fffbeb; }
-        .priority-low { border-left: 4px solid #10b981; background: #f0fdf4; }
-        
-        .custom-item { border: 2px dashed #cbd5e1; }
-        
-        .touch-target {
-            min-height: 44px;
-            min-width: 44px;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
         
-        .sticky-header {
-            position: sticky;
-            top: 0;
-            z-index: 50;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
+            color: #333;
+            padding: 30px 20px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
         
-        input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .progress-container {
+            margin: 20px 0;
+        }
+        
+        .progress-bar {
+            background: rgba(255,255,255,0.3);
+            border-radius: 25px;
+            height: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            height: 100%;
+            border-radius: 25px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            margin-top: 10px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .sync-controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .sync-controls h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .sync-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-height: 44px;
+        }
+        
+        .sync-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .import-button {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        
+        .export-button {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+        }
+        
+        .sync-textarea {
+            width: 100%;
+            height: 120px;
+            margin: 15px 0;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.8em;
+            resize: vertical;
+        }
+        
+        .category {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .category-header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 20px;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+        
+        .checklist-item {
+            padding: 18px 20px;
+            border-bottom: 1px solid #f8f9fa;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        .checklist-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+        
+        .priority-high { border-left: 5px solid #e74c3c; }
+        .priority-medium { border-left: 5px solid #f39c12; }
+        .priority-low { border-left: 5px solid #27ae60; }
+        
+        .checkbox-wrapper {
+            position: relative;
+            min-width: 24px;
+        }
+        
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            transform: scale(1.2);
+        }
+        
+        .item-content {
+            flex: 1;
+        }
+        
+        .item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 1em;
+        }
+        
+        .item-description {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        .priority-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .badge-high { background: #fee2e2; color: #dc2626; }
+        .badge-medium { background: #fef3c7; color: #d97706; }
+        .badge-low { background: #dcfce7; color: #16a34a; }
+        
+        .delete-button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.2s;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .delete-button:hover {
+            background: #c82333;
+        }
+        
+        .add-custom {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: transform 0.2s;
+            min-height: 44px;
+            width: calc(100% - 40px);
+        }
+        
+        .add-custom:hover {
+            transform: translateY(-2px);
+        }
+        
+        .custom-input {
+            margin: 15px 20px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            width: calc(100% - 40px);
+            font-size: 1em;
+            min-height: 44px;
+        }
+        
+        .floating-stats {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            font-size: 0.9em;
+            font-weight: 600;
+            z-index: 1000;
+        }
+        
+        .import-area {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        /* スマートフォン対応 */
+        @media (max-width: 768px) {
+            .container { 
+                padding: 15px 10px; 
+            }
+            
+            .header { 
+                padding: 25px 20px;
+                margin-bottom: 20px;
+            }
+            
+            .header h1 { 
+                font-size: 1.5em; 
+            }
+            
+            .sync-controls {
+                padding: 20px 15px;
+            }
+            
+            .sync-button {
+                width: 100%;
+                margin: 8px 0;
+                padding: 15px;
+                font-size: 1em;
+            }
+            
+            .checklist-item {
+                padding: 15px;
+                gap: 12px;
+            }
+            
+            .item-title {
+                font-size: 0.95em;
+            }
+            
+            .item-description {
+                font-size: 0.85em;
+            }
+            
+            .floating-stats { 
+                bottom: 15px; 
+                right: 15px; 
+                padding: 12px 16px;
+                font-size: 0.8em;
+            }
+            
+            .delete-button {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px 5px;
+            }
+            
+            .checklist-item {
+                padding: 12px 10px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .checkbox-wrapper {
+                order: 1;
+            }
+            
+            .item-content {
+                order: 2;
+                flex: 1 1 100%;
+            }
+            
+            .priority-badge {
+                order: 3;
+            }
+            
+            .delete-button {
+                order: 4;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-50 font-sans">
-    <!-- ヘッダー -->
-    <header class="sticky-header bg-white bg-opacity-90 shadow-sm border-b border-gray-200 p-4">
-        <div class="max-w-4xl mx-auto">
-            <h1 class="text-2xl font-bold text-gray-800 mb-2">
-                <i class="fas fa-home text-blue-600 mr-2"></i>
-                戸建て最終内覧会チェックリスト
-            </h1>
-            <div class="flex flex-wrap items-center gap-4 text-sm">
-                <div class="bg-blue-100 px-3 py-1 rounded-full">
-                    <span id="totalProgress">0%</span> 完了
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 戸建て内覧会チェックリスト</h1>
+            <p>修正版 - 削除機能付き</p>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar"></div>
                 </div>
-                <div class="bg-green-100 px-3 py-1 rounded-full">
-                    <span id="completedItems">0</span>/<span id="totalItems">0</span> 項目
-                </div>
-                <button onclick="resetAll()" class="no-print bg-red-100 hover:bg-red-200 px-3 py-1 rounded-full text-red-600 transition-colors">
-                    <i class="fas fa-redo text-xs mr-1"></i>リセット
-                </button>
+                <div class="progress-text" id="progressText">0% 完了</div>
             </div>
         </div>
-    </header>
 
-    <main class="max-w-4xl mx-auto p-4 space-y-6 pb-20">
-        
-        <!-- チェック時の基本的な考え方 -->
-        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">
-                <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
-                チェック時の基本的な考え方
-            </h2>
-            <div class="grid md:grid-cols-2 gap-4">
-                <div class="bg-red-50 p-4 rounded-lg border border-red-200">
-                    <h3 class="font-semibold text-red-800 mb-2">🔴 最重要ポイント</h3>
-                    <ul class="text-sm text-red-700 space-y-1">
-                        <li>• 引き渡し前が修正の最後のチャンス</li>
-                        <li>• 構造・安全性に関わる不具合</li>
-                        <li>• 雨漏りにつながる可能性のある箇所</li>
-                        <li>• 法的基準を満たしているか</li>
-                    </ul>
-                </div>
-                <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
-                    <h3 class="font-semibold text-amber-800 mb-2">🟡 重要ポイント</h3>
-                    <ul class="text-sm text-amber-700 space-y-1">
-                        <li>• 日常生活に直結する設備の動作</li>
-                        <li>• 図面・契約内容との整合性</li>
-                        <li>• 入居後すぐに必要な機能</li>
-                        <li>• 修正に時間がかかる可能性のある箇所</li>
-                    </ul>
-                </div>
+        <div class="sync-controls">
+            <h3>📤 データ共有機能</h3>
+            <button class="sync-button export-button" onclick="exportData()">📋 データをコピー</button>
+            <button class="sync-button import-button" onclick="toggleImportArea()">📥 データを読み込み</button>
+            <button class="sync-button" onclick="generateShareURL()">🔗 共有URLを生成</button>
+            
+            <div id="importArea" class="import-area" style="display:none;">
+                <h4>データを読み込み</h4>
+                <textarea class="sync-textarea" id="importData" placeholder="他のデバイスからコピーしたデータをここに貼り付けてください..."></textarea>
+                <button class="sync-button import-button" onclick="importData()">読み込み実行</button>
             </div>
-            <div class="mt-4 bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <h3 class="font-semibold text-blue-800 mb-2">💡 チェックのコツ</h3>
-                <div class="text-sm text-blue-700 grid md:grid-cols-2 gap-2">
-                    <div>
-                        <p>• 明るい時間帯に実施</p>
-                        <p>• 図面と実物を照合</p>
-                        <p>• 実際に動かして確認</p>
-                    </div>
-                    <div>
-                        <p>• 気になる箇所は写真撮影</p>
-                        <p>• その場で指摘・記録</p>
-                        <p>• 家族全員で参加</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+        </div>
 
         <!-- 1. 図面との整合確認 -->
-        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-800">
-                    <i class="fas fa-drafting-compass text-blue-600 mr-2"></i>
-                    1. 図面との整合確認
-                </h2>
-                <button onclick="addCustomItem('drawings')" class="no-print bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-lg text-blue-600 text-sm transition-colors touch-target">
-                    <i class="fas fa-plus mr-1"></i>項目追加
-                </button>
+        <div class="category">
+            <div class="category-header">🔴 1. 図面との整合確認</div>
+            <div class="checklist-item priority-high">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">間取り・部屋配置の確認</div>
+                    <div class="item-description">各部屋の位置、寸法、扉の位置と開く方向が図面通りか</div>
+                </div>
+                <span class="priority-badge badge-high">最重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
-            <div id="drawings-items" class="space-y-3">
-                <div class="priority-high p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">間取り・部屋配置の確認</div>
-                            <div class="text-sm text-gray-600 mt-1">各部屋の位置、寸法、扉の位置と開く方向が図面通りか</div>
-                        </div>
-                    </label>
+            <div class="checklist-item priority-high">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
                 </div>
-                <div class="priority-high p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">窓・サッシの種類・位置</div>
-                            <div class="text-sm text-gray-600 mt-1">窓の種類（引き違い、上げ下げ等）、サイズ、取付高さ</div>
-                        </div>
-                    </label>
+                <div class="item-content">
+                    <div class="item-title">窓・サッシの種類・位置</div>
+                    <div class="item-description">窓の種類（引き違い、上げ下げ等）、サイズ、取付高さ、ガラス種類</div>
                 </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">照明器具の位置・数</div>
-                            <div class="text-sm text-gray-600 mt-1">ダウンライト、シーリングライトの位置と数量</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">コンセント・スイッチの位置・数</div>
-                            <div class="text-sm text-gray-600 mt-1">電気図面通りの配置、インターネット・TV回線の位置</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">収納の仕様・容量</div>
-                            <div class="text-sm text-gray-600 mt-1">クローゼット、押入れのサイズ、棚板の位置</div>
-                        </div>
-                    </label>
-                </div>
+                <span class="priority-badge badge-high">最重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
-        </section>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">照明器具の位置・数</div>
+                    <div class="item-description">ダウンライト、シーリングライトの位置と数量、スイッチとの対応</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">コンセント・スイッチの位置・数</div>
+                    <div class="item-description">電気図面通りの配置、高さ、インターネット・TV回線の位置</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <div class="checklist-item priority-low">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">収納の仕様・容量</div>
+                    <div class="item-description">クローゼット、押入れのサイズ、棚板・ハンガーパイプの位置</div>
+                </div>
+                <span class="priority-badge badge-low">確認推奨</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <button class="add-custom" onclick="addCustomItem(this)">+ カスタム項目を追加</button>
+        </div>
 
         <!-- 2. 構造・安全性 -->
-        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-800">
-                    <i class="fas fa-hard-hat text-orange-600 mr-2"></i>
-                    2. 構造・安全性
-                </h2>
-                <button onclick="addCustomItem('structure')" class="no-print bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-lg text-blue-600 text-sm transition-colors touch-target">
-                    <i class="fas fa-plus mr-1"></i>項目追加
-                </button>
+        <div class="category">
+            <div class="category-header">🔴 2. 構造・安全性（目視確認範囲）</div>
+            <div class="checklist-item priority-high">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">基礎のひび割れ確認</div>
+                    <div class="item-description">基礎立上り部分の0.5mm以上のひび割れ（シャープペンシル芯で測定）</div>
+                </div>
+                <span class="priority-badge badge-high">最重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
-            <div id="structure-items" class="space-y-3">
-                <div class="priority-high p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">基礎のひび割れ確認</div>
-                            <div class="text-sm text-gray-600 mt-1">0.5mm以上のひび割れがないか（シャープペンシルの芯で測定）</div>
-                        </div>
-                    </label>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
                 </div>
-                <div class="priority-high p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">床下構造金物の設置状況</div>
-                            <div class="text-sm text-gray-600 mt-1">アンカーボルト、構造金物のボルトの緩み、設置忘れ</div>
-                        </div>
-                    </label>
+                <div class="item-content">
+                    <div class="item-title">床の歩行感・傾き確認</div>
+                    <div class="item-description">各部屋を歩いて異常な沈み、きしみ音、明らかな傾きがないか</div>
                 </div>
-                <div class="priority-high p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">屋根裏構造金物の状況</div>
-                            <div class="text-sm text-gray-600 mt-1">羽子板ボルト、構造金物のボルト・ナットの緩み</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-high p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">床・壁の傾き確認</div>
-                            <div class="text-sm text-gray-600 mt-1">水平器で床・壁の傾きを測定、違和感のある傾き</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">階段・手すりの固定状況</div>
-                            <div class="text-sm text-gray-600 mt-1">手すりのぐらつき、階段のきしみ音</div>
-                        </div>
-                    </label>
-                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
-        </section>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">階段・手すりの固定状況</div>
+                    <div class="item-description">手すりのぐらつき、階段のきしみ音、踏み板の浮き</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">窓・ドアの開閉・施錠確認</div>
+                    <div class="item-description">全ての建具の開閉動作、鍵の動作、ガラスの割れや歪み</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <button class="add-custom" onclick="addCustomItem(this)">+ カスタム項目を追加</button>
+        </div>
 
         <!-- 3. 外装・屋根 -->
-        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-800">
-                    <i class="fas fa-home text-green-600 mr-2"></i>
-                    3. 外装・屋根
-                </h2>
-                <button onclick="addCustomItem('exterior')" class="no-print bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-lg text-blue-600 text-sm transition-colors touch-target">
-                    <i class="fas fa-plus mr-1"></i>項目追加
-                </button>
+        <div class="category">
+            <div class="category-header">🔴 3. 外装・屋根（地上確認範囲）</div>
+            <div class="checklist-item priority-high">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">外壁のひび割れ・欠け</div>
+                    <div class="item-description">サイディング、モルタル等の割れ、欠け、浮き、反り</div>
+                </div>
+                <span class="priority-badge badge-high">最重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
-            <div id="exterior-items" class="space-y-3">
-                <div class="priority-high p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">外壁のひび割れ・欠け</div>
-                            <div class="text-sm text-gray-600 mt-1">サイディング、モルタル等の割れ、欠け、浮き</div>
-                        </div>
-                    </label>
+            <div class="checklist-item priority-high">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
                 </div>
-                <div class="priority-high p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">シーリング（コーキング）の状態</div>
-                            <div class="text-sm text-gray-600 mt-1">外壁継ぎ目、サッシ周り、配管貫通部の隙間</div>
-                        </div>
-                    </label>
+                <div class="item-content">
+                    <div class="item-title">シーリング（コーキング）の状態</div>
+                    <div class="item-description">外壁継ぎ目、サッシ周り、配管貫通部の隙間、剥がれ、打ち忘れ</div>
                 </div>
-                <div class="priority-high p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">屋根材の状態</div>
-                            <div class="text-sm text-gray-600 mt-1">瓦、スレート等の割れ、ずれ、浮き</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">雨樋の設置・固定状況</div>
-                            <div class="text-sm text-gray-600 mt-1">雨樋の割れ、金物の固定状況、ぐらつき</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">軒天・破風の状態</div>
-                            <div class="text-sm text-gray-600 mt-1">軒天ボードの割れ、隙間、換気口の塞がり</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">バルコニー防水・笠木</div>
-                            <div class="text-sm text-gray-600 mt-1">防水層の状態、笠木板金の隙間、排水の流れ</div>
-                        </div>
-                    </label>
-                </div>
+                <span class="priority-badge badge-high">最重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
-        </section>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">バルコニー防水・手すり</div>
+                    <div class="item-description">防水層の状態、排水勾配、手すりの固定状況</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">雨樋の設置・固定状況</div>
+                    <div class="item-description">雨樋の割れ、金物の固定状況、継手部分の隙間</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <button class="add-custom" onclick="addCustomItem(this)">+ カスタム項目を追加</button>
+        </div>
 
         <!-- 4. 内装・仕上げ -->
-        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-800">
-                    <i class="fas fa-paint-roller text-purple-600 mr-2"></i>
-                    4. 内装・仕上げ
-                </h2>
-                <button onclick="addCustomItem('interior')" class="no-print bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-lg text-blue-600 text-sm transition-colors touch-target">
-                    <i class="fas fa-plus mr-1"></i>項目追加
-                </button>
+        <div class="category">
+            <div class="category-header">🟢 4. 内装・仕上げ</div>
+            <div class="checklist-item priority-low">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">床材の傷・へこみ・隙間</div>
+                    <div class="item-description">フローリング、畳、CF等の傷、継ぎ目の隙間、床鳴り</div>
+                </div>
+                <span class="priority-badge badge-low">確認推奨</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
-            <div id="interior-items" class="space-y-3">
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">床材の傷・へこみ・隙間</div>
-                            <div class="text-sm text-gray-600 mt-1">フローリング、畳、CF等の傷、継ぎ目の隙間</div>
-                        </div>
-                    </label>
+            <div class="checklist-item priority-low">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
                 </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">壁紙・塗装の仕上がり</div>
-                            <div class="text-sm text-gray-600 mt-1">クロスの浮き、剥がれ、継ぎ目の隙間、塗装のムラ</div>
-                        </div>
-                    </label>
+                <div class="item-content">
+                    <div class="item-title">壁紙・塗装の仕上がり</div>
+                    <div class="item-description">クロスの浮き、剥がれ、継ぎ目の隙間、塗装のムラ</div>
                 </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">天井の仕上がり</div>
-                            <div class="text-sm text-gray-600 mt-1">クロス、塗装の仕上がり、継ぎ目、シミ・汚れ</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">建具の開閉動作</div>
-                            <div class="text-sm text-gray-600 mt-1">ドア、引き戸、収納扉の開閉、鍵の動作</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-low p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">巾木・回り縁の設置</div>
-                            <div class="text-sm text-gray-600 mt-1">巾木の設置、継ぎ目の仕上がり</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-low p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">床鳴り・きしみ音</div>
-                            <div class="text-sm text-gray-600 mt-1">歩行時の床鳴り、階段のきしみ音</div>
-                        </div>
-                    </label>
-                </div>
+                <span class="priority-badge badge-low">確認推奨</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
-        </section>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">建具の開閉動作</div>
+                    <div class="item-description">ドア、引き戸、収納扉の開閉、戸当たり調整、ソフトクローズ機能</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <div class="checklist-item priority-low">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">巾木・回り縁の施工状況</div>
+                    <div class="item-description">継手部分の隙間、釘の出っ張り、角部分の納まり</div>
+                </div>
+                <span class="priority-badge badge-low">確認推奨</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <button class="add-custom" onclick="addCustomItem(this)">+ カスタム項目を追加</button>
+        </div>
 
         <!-- 5. 設備・電気 -->
-        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-800">
-                    <i class="fas fa-bolt text-yellow-600 mr-2"></i>
-                    5. 設備・電気
-                </h2>
-                <button onclick="addCustomItem('electrical')" class="no-print bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-lg text-blue-600 text-sm transition-colors touch-target">
-                    <i class="fas fa-plus mr-1"></i>項目追加
-                </button>
+        <div class="category">
+            <div class="category-header">🟡 5. 設備・電気</div>
+            <div class="checklist-item priority-high">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">全照明器具の点灯確認</div>
+                    <div class="item-description">各部屋の照明、調光機能、人感センサーの動作</div>
+                </div>
+                <span class="priority-badge badge-high">最重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
-            <div id="electrical-items" class="space-y-3">
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">全照明器具の点灯確認</div>
-                            <div class="text-sm text-gray-600 mt-1">LED、蛍光灯、ダウンライト等の点灯、調光機能</div>
-                        </div>
-                    </label>
+            <div class="checklist-item priority-high">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
                 </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">全コンセントの通電確認</div>
-                            <div class="text-sm text-gray-600 mt-1">スマホ充電器等で通電確認、アース付きコンセント</div>
-                        </div>
-                    </label>
+                <div class="item-content">
+                    <div class="item-title">全コンセントの通電確認</div>
+                    <div class="item-description">スマホ充電器等で通電確認、アース付きコンセントの設置場所</div>
                 </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">インターホン・TVモニター</div>
-                            <div class="text-sm text-gray-600 mt-1">インターホンの動作、画質、音質確認</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">換気扇の動作確認</div>
-                            <div class="text-sm text-gray-600 mt-1">各所換気扇の動作、異音の有無、風量</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">火災報知器・ガス警報器</div>
-                            <div class="text-sm text-gray-600 mt-1">設置位置、作動確認（テストボタン）</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-low p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">分電盤・ブレーカー</div>
-                            <div class="text-sm text-gray-600 mt-1">分電盤の設置、回路表示、漏電ブレーカー</div>
-                        </div>
-                    </label>
-                </div>
+                <span class="priority-badge badge-high">最重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
-        </section>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">換気扇・24時間換気の動作確認</div>
+                    <div class="item-description">各所換気扇の動作、異音の有無、吸引力（ティッシュで確認）</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">インターホン・火災報知器の動作</div>
+                    <div class="item-description">呼び出し音、画像確認、各階火災報知器の連動確認</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <button class="add-custom" onclick="addCustomItem(this)">+ カスタム項目を追加</button>
+        </div>
 
         <!-- 6. 水回り -->
-        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-800">
-                    <i class="fas fa-tint text-blue-600 mr-2"></i>
-                    6. 水回り
-                </h2>
-                <button onclick="addCustomItem('plumbing')" class="no-print bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-lg text-blue-600 text-sm transition-colors touch-target">
-                    <i class="fas fa-plus mr-1"></i>項目追加
-                </button>
+        <div class="category">
+            <div class="category-header">🔴 6. 水回り</div>
+            <div class="checklist-item priority-high">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">配管からの漏水確認</div>
+                    <div class="item-description">キッチン下、洗面台下、トイレ周りの配管接続部（目視・触診）</div>
+                </div>
+                <span class="priority-badge badge-high">最重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
-            <div id="plumbing-items" class="space-y-3">
-                <div class="priority-high p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">給水・給湯の水圧・水量</div>
-                            <div class="text-sm text-gray-600 mt-1">各蛇口の水圧、お湯の温度と出湯量</div>
-                        </div>
-                    </label>
+            <div class="checklist-item priority-high">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
                 </div>
-                <div class="priority-high p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">排水の流れ・詰まり</div>
-                            <div class="text-sm text-gray-600 mt-1">キッチン、洗面、浴室、トイレの排水状況</div>
-                        </div>
-                    </label>
+                <div class="item-content">
+                    <div class="item-title">給水・給湯の水圧・温度</div>
+                    <div class="item-description">各蛇口の水圧、お湯の設定温度と実際の温度、混合水栓の左右</div>
                 </div>
-                <div class="priority-high p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">配管からの漏水確認</div>
-                            <div class="text-sm text-gray-600 mt-1">キッチン下、洗面台下、床下の配管接続部</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">キッチン設備の動作</div>
-                            <div class="text-sm text-gray-600 mt-1">食洗機、IHコンロ、レンジフード、収納扉</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">浴室・トイレ設備</div>
-                            <div class="text-sm text-gray-600 mt-1">浴室乾燥機、温水洗浄便座、換気扇</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-low p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">水回り付属品の設置</div>
-                            <div class="text-sm text-gray-600 mt-1">タオルハンガー、ペーパーホルダー、棚板</div>
-                        </div>
-                    </label>
-                </div>
+                <span class="priority-badge badge-high">最重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
-        </section>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">排水の流れ・音</div>
+                    <div class="item-description">キッチン、洗面、浴室、トイレの排水状況、異音の有無</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">トイレの動作確認</div>
+                    <div class="item-description">洗浄機能、給水停止、水漏れ、温水洗浄便座の動作</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">キッチン・浴室設備の動作</div>
+                    <div class="item-description">IHコンロ、レンジフード、食洗機、浴室換気乾燥機</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <button class="add-custom" onclick="addCustomItem(this)">+ カスタム項目を追加</button>
+        </div>
 
         <!-- 7. 外構・境界 -->
-        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-800">
-                    <i class="fas fa-tree text-green-600 mr-2"></i>
-                    7. 外構・境界
-                </h2>
-                <button onclick="addCustomItem('exterior-works')" class="no-print bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-lg text-blue-600 text-sm transition-colors touch-target">
-                    <i class="fas fa-plus mr-1"></i>項目追加
-                </button>
+        <div class="category">
+            <div class="category-header">🔴 7. 外構・境界</div>
+            <div class="checklist-item priority-high">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">境界標の設置確認</div>
+                    <div class="item-description">隣地との境界標（境界杭）の設置状況と位置</div>
+                </div>
+                <span class="priority-badge badge-high">最重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
-            <div id="exterior-works-items" class="space-y-3">
-                <div class="priority-high p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">境界標の設置確認</div>
-                            <div class="text-sm text-gray-600 mt-1">隣地との境界標（境界杭）の設置、位置</div>
-                        </div>
-                    </label>
+            <div class="checklist-item priority-high">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
                 </div>
-                <div class="priority-high p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">隣地への越境確認</div>
-                            <div class="text-sm text-gray-600 mt-1">屋根、軒、エアコン室外機等の越境がないか</div>
-                        </div>
-                    </label>
+                <div class="item-content">
+                    <div class="item-title">隣地への越境確認</div>
+                    <div class="item-description">屋根、軒、エアコン室外機、雨樋等の越境チェック</div>
                 </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">外構工事の完成度</div>
-                            <div class="text-sm text-gray-600 mt-1">門扉、フェンス、カーポート、アプローチ</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-medium p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">玄関ポーチ・犬走り</div>
-                            <div class="text-sm text-gray-600 mt-1">タイルの浮き・割れ、コンクリートのひび割れ</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-low p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">立水栓・排水設備</div>
-                            <div class="text-sm text-gray-600 mt-1">立水栓の水量、排水桝の詰まり、勾配</div>
-                        </div>
-                    </label>
-                </div>
-                <div class="priority-low p-4 rounded-lg">
-                    <label class="flex items-start space-x-3 cursor-pointer">
-                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
-                        <div>
-                            <div class="font-medium text-gray-800">外部照明・門灯</div>
-                            <div class="text-sm text-gray-600 mt-1">外部照明の点灯、センサーライトの動作</div>
-                        </div>
-                    </label>
-                </div>
+                <span class="priority-badge badge-high">最重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
-        </section>
+            <div class="checklist-item priority-low">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">外構工事の完成度</div>
+                    <div class="item-description">門扉、フェンス、アプローチ、駐車場の仕上がり</div>
+                </div>
+                <span class="priority-badge badge-low">確認推奨</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <div class="checklist-item priority-low">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">玄関ポーチ・犬走り</div>
+                    <div class="item-description">タイルの浮き・割れ、コンクリートのひび割れ、排水勾配</div>
+                </div>
+                <span class="priority-badge badge-low">確認推奨</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <button class="add-custom" onclick="addCustomItem(this)">+ カスタム項目を追加</button>
+        </div>
 
-        <!-- 指摘事項記録欄 -->
-        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">
-                <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
-                指摘事項記録
-            </h2>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">発見した不具合・気になる点</label>
-                    <textarea id="issues" rows="6" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="例：
-- リビング天井に小さなシミあり（位置：南西角）
-- キッチン下の配管に軽微な水滴
-- 2階トイレのドアが少し重い
-- 外壁南面のシーリングに一部隙間"></textarea>
+        <!-- 8. オプション項目 -->
+        <div class="category">
+            <div class="category-header">🟡 8. オプション項目</div>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
                 </div>
-                <div class="grid md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">検査実施日</label>
-                        <input type="date" id="inspection-date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">立会者</label>
-                        <input type="text" id="attendees" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="例：田中（施主）、佐藤（現場監督）">
-                    </div>
+                <div class="item-content">
+                    <div class="item-title">玄関回りの照明センサー</div>
+                    <div class="item-description">人感センサーの動作確認、感知範囲の調整</div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">修繕完了予定日・再検査日</label>
-                    <input type="date" id="repair-date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
-        </section>
-
-    </main>
-
-    <!-- フローティングメニュー（スマホ用） -->
-    <div class="no-print fixed bottom-4 right-4 z-50">
-        <div class="bg-white rounded-full shadow-lg border border-gray-200 p-4">
-            <div class="text-center">
-                <div class="text-2xl font-bold text-blue-600" id="floatingProgress">0%</div>
-                <div class="text-xs text-gray-600">完了</div>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">階段照明の配電（三叉路）</div>
+                    <div class="item-description">1階・2階・踊り場での照明スイッチの連動確認</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
             </div>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">各ドアの留め具（アーム、バー、床付け）</div>
+                    <div class="item-description">ドアストッパー類の設置確認と動作テスト</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">テレビ裏の下地</div>
+                    <div class="item-description">壁掛けテレビ用の下地補強材の設置確認</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">カップボードの横向きコンセント設置</div>
+                    <div class="item-description">指定した横向きコンセントの位置と向きの確認</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">1,3階の床板向き</div>
+                    <div class="item-description">フローリングの張り方向が指定通りか確認</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <div class="checklist-item priority-medium">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">庭スペースの砂利無し</div>
+                    <div class="item-description">指定した庭エリアに砂利が敷かれていないことの確認</div>
+                </div>
+                <span class="priority-badge badge-medium">重要</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            </div>
+            <button class="add-custom" onclick="addCustomItem(this)">+ カスタム項目を追加</button>
         </div>
     </div>
 
+    <div class="floating-stats" id="floatingStats">
+        チェック完了: 0/31
+    </div>
+
     <script>
-        // ローカルストレージのキー
-        const STORAGE_KEY = 'kodate_inspection_checklist';
-        
-        // データの保存
+        // データ管理システム
         function saveData() {
             const data = {
-                checkboxes: {},
-                customItems: {},
-                issues: document.getElementById('issues').value,
-                inspectionDate: document.getElementById('inspection-date').value,
-                attendees: document.getElementById('attendees').value,
-                repairDate: document.getElementById('repair-date').value
+                checkboxes: [],
+                customItems: [],
+                timestamp: new Date().toISOString(),
+                version: '3.0'
             };
             
             // チェックボックスの状態を保存
             document.querySelectorAll('input[type="checkbox"]').forEach((checkbox, index) => {
-                data.checkboxes[index] = checkbox.checked;
-            });
-            
-            // カスタム項目を保存
-            document.querySelectorAll('.custom-item').forEach((item, index) => {
-                const text = item.querySelector('.custom-item-text');
-                const checkbox = item.querySelector('input[type="checkbox"]');
-                const priority = item.classList.contains('priority-high') ? 'high' : 
-                              item.classList.contains('priority-medium') ? 'medium' : 'low';
-                const category = item.closest('[id$="-items"]').id.replace('-items', '');
-                
-                data.customItems[index] = {
-                    text: text.textContent,
+                const item = checkbox.closest('.checklist-item');
+                data.checkboxes.push({
+                    index: index,
                     checked: checkbox.checked,
-                    priority: priority,
-                    category: category
-                };
+                    itemText: item?.querySelector('.item-title')?.textContent || '',
+                    isCustom: item?.classList.contains('custom-item') || false
+                });
             });
             
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            // カスタム項目を別途保存
+            document.querySelectorAll('.custom-item').forEach(item => {
+                data.customItems.push({
+                    title: item.querySelector('.item-title')?.textContent || '',
+                    description: item.querySelector('.item-description')?.textContent || '',
+                    priority: item.classList.contains('priority-high') ? 'high' : 
+                             item.classList.contains('priority-medium') ? 'medium' : 'low',
+                    categoryIndex: Array.from(document.querySelectorAll('.category')).findIndex(cat => 
+                        cat.contains(item)
+                    )
+                });
+            });
+            
+            localStorage.setItem('checklistData', JSON.stringify(data));
+            return data;
         }
         
-        // データの読み込み
         function loadData() {
-            const savedData = localStorage.getItem(STORAGE_KEY);
-            if (!savedData) return;
-            
-            const data = JSON.parse(savedData);
-            
-            // チェックボックスの状態を復元
-            if (data.checkboxes) {
-                document.querySelectorAll('input[type="checkbox"]').forEach((checkbox, index) => {
-                    if (data.checkboxes[index]) {
-                        checkbox.checked = true;
+            const savedData = localStorage.getItem('checklistData');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    
+                    // 既存のカスタム項目をクリア
+                    document.querySelectorAll('.custom-item').forEach(item => item.remove());
+                    
+                    // カスタム項目を復元
+                    if (data.customItems) {
+                        data.customItems.forEach(customItem => {
+                            const categories = document.querySelectorAll('.category');
+                            if (categories[customItem.categoryIndex]) {
+                                createCustomItemElement(
+                                    customItem.title,
+                                    customItem.description,
+                                    customItem.priority,
+                                    categories[customItem.categoryIndex]
+                                );
+                            }
+                        });
                     }
-                });
+                    
+                    // チェックボックスの状態を復元
+                    data.checkboxes.forEach((item, index) => {
+                        const checkbox = document.querySelectorAll('input[type="checkbox"]')[index];
+                        if (checkbox) {
+                            checkbox.checked = item.checked;
+                        }
+                    });
+                    
+                    updateProgress();
+                } catch (error) {
+                    console.error('データの読み込みに失敗:', error);
+                }
             }
-            
-            // テキストフィールドを復元
-            if (data.issues) document.getElementById('issues').value = data.issues;
-            if (data.inspectionDate) document.getElementById('inspection-date').value = data.inspectionDate;
-            if (data.attendees) document.getElementById('attendees').value = data.attendees;
-            if (data.repairDate) document.getElementById('repair-date').value = data.repairDate;
-            
-            // カスタム項目を復元
-            if (data.customItems) {
-                Object.values(data.customItems).forEach(item => {
-                    addCustomItemWithData(item.category, item.text, item.priority, item.checked);
-                });
-            }
-            
-            updateProgress();
         }
         
-        // 進捗の更新
+        // 項目削除機能
+        function deleteItem(button) {
+            const item = button.closest('.checklist-item');
+            const title = item.querySelector('.item-title').textContent;
+            
+            if (confirm(`「${title}」を削除しますか？`)) {
+                item.remove();
+                updateProgress();
+                saveData();
+                showNotification('項目を削除しました', 'success');
+            }
+        }
+        
+        // データエクスポート
+        function exportData() {
+            const data = saveData();
+            const jsonString = JSON.stringify(data, null, 2);
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(jsonString).then(() => {
+                    showNotification('✅ データをクリップボードにコピーしました！', 'success');
+                }).catch(() => {
+                    fallbackCopy(jsonString);
+                });
+            } else {
+                fallbackCopy(jsonString);
+            }
+        }
+        
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 90%;
+                height: 60%;
+                z-index: 10000;
+                background: white;
+                border: 3px solid #333;
+                border-radius: 10px;
+                padding: 20px;
+                font-family: monospace;
+                font-size: 12px;
+            `;
+            document.body.appendChild(textarea);
+            textarea.select();
+            textarea.setSelectionRange(0, 99999);
+            
+            showNotification('📋 テキストエリアの内容を手動でコピーしてください', 'info');
+            
+            setTimeout(() => {
+                if (document.body.contains(textarea)) {
+                    document.body.removeChild(textarea);
+                }
+            }, 30000);
+        }
+        
+        // データインポート
+        function toggleImportArea() {
+            const importArea = document.getElementById('importArea');
+            importArea.style.display = importArea.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function importData() {
+            const importText = document.getElementById('importData').value.trim();
+            if (!importText) {
+                showNotification('❌ データが入力されていません', 'error');
+                return;
+            }
+            
+            try {
+                const data = JSON.parse(importText);
+                localStorage.setItem('checklistData', importText);
+                loadData();
+                showNotification('✅ データを正常に読み込みました！', 'success');
+                document.getElementById('importArea').style.display = 'none';
+                document.getElementById('importData').value = '';
+            } catch (error) {
+                showNotification('❌ データの形式が正しくありません', 'error');
+            }
+        }
+        
+        // 共有URL生成
+        function generateShareURL() {
+            const data = saveData();
+            const encodedData = btoa(encodeURIComponent(JSON.stringify(data)));
+            const currentURL = window.location.href.split('#')[0];
+            const shareURL = `${currentURL}#data=${encodedData}`;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareURL).then(() => {
+                    showNotification('🔗 共有URLをクリップボードにコピーしました！', 'success');
+                }).catch(() => {
+                    showShareDialog(shareURL);
+                });
+            } else {
+                showShareDialog(shareURL);
+            }
+        }
+        
+        function showShareDialog(url) {
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                z-index: 10000;
+                max-width: 90%;
+                text-align: center;
+            `;
+            
+            dialog.innerHTML = `
+                <h3>🔗 共有URL</h3>
+                <p style="margin: 15px 0; font-size: 0.9em; color: #666;">
+                    このURLを他のデバイスで開くとデータが自動読み込みされます
+                </p>
+                <textarea readonly style="width: 100%; height: 100px; margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.8em;">${url}</textarea>
+                <button onclick="this.parentElement.remove()" style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">閉じる</button>
+            `;
+            
+            document.body.appendChild(dialog);
+            dialog.querySelector('textarea').select();
+        }
+        
+        // URL からデータを自動読み込み
+        function loadFromURL() {
+            const hash = window.location.hash;
+            if (hash.includes('#data=')) {
+                try {
+                    const encodedData = hash.split('#data=')[1];
+                    const data = JSON.parse(decodeURIComponent(atob(encodedData)));
+                    localStorage.setItem('checklistData', JSON.stringify(data));
+                    loadData();
+                    showNotification('✅ 共有データを自動読み込みしました！', 'success');
+                    // URLのハッシュをクリア
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } catch (error) {
+                    console.error('URL からのデータ読み込みに失敗:', error);
+                    showNotification('❌ 共有データの読み込みに失敗しました', 'error');
+                }
+            }
+        }
+        
+        // 通知システム
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            const colors = {
+                'success': '#4CAF50',
+                'error': '#f44336',
+                'info': '#2196F3'
+            };
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${colors[type]};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 25px;
+                box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+                z-index: 10000;
+                font-weight: 600;
+                max-width: 90%;
+                text-align: center;
+            `;
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
+            }, 4000);
+        }
+        
+        // 進捗管理
         function updateProgress() {
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const checked = document.querySelectorAll('input[type="checkbox"]:checked');
             const total = checkboxes.length;
-            const completed = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const completed = checked.length;
             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
             
-            document.getElementById('totalProgress').textContent = percentage + '%';
-            document.getElementById('floatingProgress').textContent = percentage + '%';
-            document.getElementById('completedItems').textContent = completed;
-            document.getElementById('totalItems').textContent = total;
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = percentage + '% 完了';
+            document.getElementById('floatingStats').textContent = `チェック完了: ${completed}/${total}`;
             
+            // データ自動保存
             saveData();
         }
         
-        // カスタム項目の追加
-        function addCustomItem(category) {
-            const text = prompt('確認項目を入力してください：');
-            if (!text) return;
+        // カスタム項目追加
+        function addCustomItem(button) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'custom-input';
+            input.placeholder = 'カスタム項目を入力してください...';
             
-            const priorities = ['🔴 最重要', '🟡 重要', '🟢 確認推奨'];
-            const priorityChoice = prompt('重要度を選択してください：\n1: ' + priorities[0] + '\n2: ' + priorities[1] + '\n3: ' + priorities[2]);
+            const descInput = document.createElement('input');
+            descInput.type = 'text';
+            descInput.className = 'custom-input';
+            descInput.placeholder = '詳細説明を入力してください...';
+            descInput.style.marginTop = '5px';
             
-            let priority = 'low';
-            if (priorityChoice === '1') priority = 'high';
-            else if (priorityChoice === '2') priority = 'medium';
-            
-            addCustomItemWithData(category, text, priority, false);
-            updateProgress();
-        }
-        
-        // カスタム項目の追加（データ付き）
-        function addCustomItemWithData(category, text, priority, checked) {
-            const container = document.getElementById(category + '-items');
-            if (!container) return;
-            
-            const item = document.createElement('div');
-            item.className = `custom-item priority-${priority} p-4 rounded-lg`;
-            
-            item.innerHTML = `
-                <label class="flex items-start space-x-3 cursor-pointer">
-                    <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()" ${checked ? 'checked' : ''}>
-                    <div class="flex-1">
-                        <div class="font-medium text-gray-800 custom-item-text">${text}</div>
-                        <div class="text-sm text-gray-600 mt-1">カスタム項目</div>
-                    </div>
-                    <button onclick="removeCustomItem(this)" class="no-print text-red-500 hover:text-red-700 ml-2 touch-target">
-                        <i class="fas fa-trash text-sm"></i>
-                    </button>
-                </label>
+            const prioritySelect = document.createElement('select');
+            prioritySelect.className = 'custom-input';
+            prioritySelect.style.marginTop = '10px';
+            prioritySelect.innerHTML = `
+                <option value="high">🔴 最重要</option>
+                <option value="medium">🟡 重要</option>
+                <option value="low">🟢 確認推奨</option>
             `;
             
-            container.appendChild(item);
-        }
-        
-        // カスタム項目の削除
-        function removeCustomItem(button) {
-            if (confirm('この項目を削除しますか？')) {
-                button.closest('.custom-item').remove();
-                updateProgress();
-            }
-        }
-        
-        // 全データのリセット
-        function resetAll() {
-            if (confirm('すべてのデータをリセットしますか？この操作は取り消せません。')) {
-                localStorage.removeItem(STORAGE_KEY);
-                location.reload();
-            }
-        }
-        
-        // ページ読み込み時の初期化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 今日の日付をデフォルトに設定
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('inspection-date').value = today;
+            const addButton = document.createElement('button');
+            addButton.textContent = '追加';
+            addButton.className = 'sync-button';
+            addButton.style.margin = '10px 20px';
+            addButton.onclick = () => {
+                if (input.value.trim()) {
+                    createCustomItemElement(
+                        input.value.trim(),
+                        descInput.value.trim() || 'カスタム項目です',
+                        prioritySelect.value,
+                        button.parentNode
+                    );
+                    input.remove();
+                    descInput.remove();
+                    prioritySelect.remove();
+                    addButton.remove();
+                    updateProgress();
+                }
+            };
             
-            // データを読み込み
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    descInput.focus();
+                }
+            });
+            
+            descInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addButton.click();
+                }
+            });
+            
+            button.parentNode.insertBefore(input, button);
+            button.parentNode.insertBefore(descInput, button);
+            button.parentNode.insertBefore(prioritySelect, button);
+            button.parentNode.insertBefore(addButton, button);
+            input.focus();
+        }
+        
+        function createCustomItemElement(title, description, priority, container) {
+            const item = document.createElement('div');
+            item.className = `checklist-item priority-${priority} custom-item`;
+            
+            const badgeText = priority === 'high' ? '最重要' : priority === 'medium' ? '重要' : '確認推奨';
+            const badgeClass = `badge-${priority}`;
+            
+            item.innerHTML = `
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" onchange="updateProgress()">
+                </div>
+                <div class="item-content">
+                    <div class="item-title">${title}</div>
+                    <div class="item-description">${description}</div>
+                </div>
+                <span class="priority-badge ${badgeClass}">${badgeText}</span>
+                <button class="delete-button" onclick="deleteItem(this)" title="項目を削除">×</button>
+            `;
+            
+            const addButton = container.querySelector('.add-custom');
+            container.insertBefore(item, addButton);
+        }
+        
+        // 初期化
+        window.addEventListener('load', () => {
+            loadFromURL();
             loadData();
-            
-            // テキストエリアの変更を監視
-            document.getElementById('issues').addEventListener('input', saveData);
-            document.getElementById('inspection-date').addEventListener('change', saveData);
-            document.getElementById('attendees').addEventListener('input', saveData);
-            document.getElementById('repair-date').addEventListener('change', saveData);
-        });
-        
-        // すべてのチェックボックスにイベントリスナーを追加
-        document.addEventListener('change', function(e) {
-            if (e.target.type === 'checkbox') {
-                updateProgress();
-            }
+            updateProgress();
         });
     </script>
 </body>
 </html>
-    <script id="html_badge_script1">
-        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
-            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDprxrz%2F%2BGUIV58fxvmSGFGeI26%2BzyMx4jynuTIl2t%2FL9ZgJlFU7zEqZtIjCAkvJsjBe1wVPU3%2BhJfWujbpil4I54jKRw8J0EZNU5IcfPxcNBf6InKGu3y6ZhKSn15f%2FYZ6ETL3HiLxSvtVzExAvTeF2Tod%2FBbrfe%2Bl6m2XnGzbzv3m4g3pWN4FX8ZC8gBgvT0ZrxgP6sDj4DY6w%2BuRPR8GFzKlkybJuVDT88esLrW744V0fajf%2B32CZJ%2BU8p8x6meAahGV6GOOLh%2FenZIOwXPAjOi1Bihd2ANvlMXWSw9qgoLlt3hJHs09lz7v%2FKQUQ1N7PyCw%2FThGG7ZONSoz5TBpn%2Bua1t7F1Thoak%2FsCfbKQMsudHq3RMmYpgnJRQwQ%2B3ie4xzbSgVpo30IwZoS6SHnYUTDOY%2B0SMbKmofrcqdmqh69KI%2Bqvjd3%2BddgRDupBgZ3mQDy0T8GW331NAdZIUZA5vG%2BTNxRQMF6ec%2BcoYrhZTL67uBV0E8KYHzlybdPBJtA%3D%3D";
-        window.__genspark_locale = "ja-JP";
-        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDprxrz/+GUIV58fxvmSGFGeI26+zyMx4jynuTIl2t/L9ZgJlFU7zEqZtIjCAkvJsjBe1wVPU3+hJfWujbpil4I54jKRw8J0EZNU5IcfPxcNBf6InKGu3y6ZhKSn15f/YZ6ETL3HiLxSvtVzExAvTeF2Tod/Bbrfe+l6m2XnGzbzv3m4g3pWN4FX8ZC8gBgvT0ZrxgP6sDj4DY6w+uRPR8GFzKlkybJuVDT88esLrW744V0fajf+32CZJ+U8p8x6meAahGV6GOOLh/enZIOwXPAjOi1Bihd2ANvlMXWSw9qgoLlt3hJHs09lz7v/KQUQ1N7PyCw/ThGG7ZONSoz5TBpn+ua1t7F1Thoak/sCfbKQMsudHq3RMmYpgnJRQwQ+3ie4xzbSgVpo30IwZoS6SHnYUTDOY+0SMbKmofrcqdmqh69KI+qvjd3+ddgRDupBgZ3mQDy0T8GW331NAdZIUZA5vG+TNxRQMF6ec+coYrhZTL67uBV0E8KYHzlybdPBJtA==";
-    </script>
-    
-    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
-    
