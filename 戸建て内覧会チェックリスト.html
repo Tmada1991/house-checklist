@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>戸建て最終内覧会チェックリスト</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+         {
+            body { font-size: 12px; }
+            .no-print { display: none !important; }
+            .print-break { page-break-inside: avoid; }
+        }
+        
+        .priority-high { border-left: 4px solid #ef4444; background: #fef2f2; }
+        .priority-medium { border-left: 4px solid #f59e0b; background: #fffbeb; }
+        .priority-low { border-left: 4px solid #10b981; background: #f0fdf4; }
+        
+        .custom-item { border: 2px dashed #cbd5e1; }
+        
+        .touch-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+        }
+        
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- ヘッダー -->
+    <header class="sticky-header bg-white bg-opacity-90 shadow-sm border-b border-gray-200 p-4">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">
+                <i class="fas fa-home text-blue-600 mr-2"></i>
+                戸建て最終内覧会チェックリスト
+            </h1>
+            <div class="flex flex-wrap items-center gap-4 text-sm">
+                <div class="bg-blue-100 px-3 py-1 rounded-full">
+                    <span id="totalProgress">0%</span> 完了
+                </div>
+                <div class="bg-green-100 px-3 py-1 rounded-full">
+                    <span id="completedItems">0</span>/<span id="totalItems">0</span> 項目
+                </div>
+                <button onclick="resetAll()" class="no-print bg-red-100 hover:bg-red-200 px-3 py-1 rounded-full text-red-600 transition-colors">
+                    <i class="fas fa-redo text-xs mr-1"></i>リセット
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 space-y-6 pb-20">
+        
+        <!-- チェック時の基本的な考え方 -->
+        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                チェック時の基本的な考え方
+            </h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                    <h3 class="font-semibold text-red-800 mb-2">🔴 最重要ポイント</h3>
+                    <ul class="text-sm text-red-700 space-y-1">
+                        <li>• 引き渡し前が修正の最後のチャンス</li>
+                        <li>• 構造・安全性に関わる不具合</li>
+                        <li>• 雨漏りにつながる可能性のある箇所</li>
+                        <li>• 法的基準を満たしているか</li>
+                    </ul>
+                </div>
+                <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                    <h3 class="font-semibold text-amber-800 mb-2">🟡 重要ポイント</h3>
+                    <ul class="text-sm text-amber-700 space-y-1">
+                        <li>• 日常生活に直結する設備の動作</li>
+                        <li>• 図面・契約内容との整合性</li>
+                        <li>• 入居後すぐに必要な機能</li>
+                        <li>• 修正に時間がかかる可能性のある箇所</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-4 bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h3 class="font-semibold text-blue-800 mb-2">💡 チェックのコツ</h3>
+                <div class="text-sm text-blue-700 grid md:grid-cols-2 gap-2">
+                    <div>
+                        <p>• 明るい時間帯に実施</p>
+                        <p>• 図面と実物を照合</p>
+                        <p>• 実際に動かして確認</p>
+                    </div>
+                    <div>
+                        <p>• 気になる箇所は写真撮影</p>
+                        <p>• その場で指摘・記録</p>
+                        <p>• 家族全員で参加</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1. 図面との整合確認 -->
+        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-drafting-compass text-blue-600 mr-2"></i>
+                    1. 図面との整合確認
+                </h2>
+                <button onclick="addCustomItem('drawings')" class="no-print bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-lg text-blue-600 text-sm transition-colors touch-target">
+                    <i class="fas fa-plus mr-1"></i>項目追加
+                </button>
+            </div>
+            <div id="drawings-items" class="space-y-3">
+                <div class="priority-high p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">間取り・部屋配置の確認</div>
+                            <div class="text-sm text-gray-600 mt-1">各部屋の位置、寸法、扉の位置と開く方向が図面通りか</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-high p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">窓・サッシの種類・位置</div>
+                            <div class="text-sm text-gray-600 mt-1">窓の種類（引き違い、上げ下げ等）、サイズ、取付高さ</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">照明器具の位置・数</div>
+                            <div class="text-sm text-gray-600 mt-1">ダウンライト、シーリングライトの位置と数量</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">コンセント・スイッチの位置・数</div>
+                            <div class="text-sm text-gray-600 mt-1">電気図面通りの配置、インターネット・TV回線の位置</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">収納の仕様・容量</div>
+                            <div class="text-sm text-gray-600 mt-1">クローゼット、押入れのサイズ、棚板の位置</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 構造・安全性 -->
+        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-hard-hat text-orange-600 mr-2"></i>
+                    2. 構造・安全性
+                </h2>
+                <button onclick="addCustomItem('structure')" class="no-print bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-lg text-blue-600 text-sm transition-colors touch-target">
+                    <i class="fas fa-plus mr-1"></i>項目追加
+                </button>
+            </div>
+            <div id="structure-items" class="space-y-3">
+                <div class="priority-high p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">基礎のひび割れ確認</div>
+                            <div class="text-sm text-gray-600 mt-1">0.5mm以上のひび割れがないか（シャープペンシルの芯で測定）</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-high p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">床下構造金物の設置状況</div>
+                            <div class="text-sm text-gray-600 mt-1">アンカーボルト、構造金物のボルトの緩み、設置忘れ</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-high p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">屋根裏構造金物の状況</div>
+                            <div class="text-sm text-gray-600 mt-1">羽子板ボルト、構造金物のボルト・ナットの緩み</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-high p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">床・壁の傾き確認</div>
+                            <div class="text-sm text-gray-600 mt-1">水平器で床・壁の傾きを測定、違和感のある傾き</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">階段・手すりの固定状況</div>
+                            <div class="text-sm text-gray-600 mt-1">手すりのぐらつき、階段のきしみ音</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 外装・屋根 -->
+        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-home text-green-600 mr-2"></i>
+                    3. 外装・屋根
+                </h2>
+                <button onclick="addCustomItem('exterior')" class="no-print bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-lg text-blue-600 text-sm transition-colors touch-target">
+                    <i class="fas fa-plus mr-1"></i>項目追加
+                </button>
+            </div>
+            <div id="exterior-items" class="space-y-3">
+                <div class="priority-high p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">外壁のひび割れ・欠け</div>
+                            <div class="text-sm text-gray-600 mt-1">サイディング、モルタル等の割れ、欠け、浮き</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-high p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">シーリング（コーキング）の状態</div>
+                            <div class="text-sm text-gray-600 mt-1">外壁継ぎ目、サッシ周り、配管貫通部の隙間</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-high p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">屋根材の状態</div>
+                            <div class="text-sm text-gray-600 mt-1">瓦、スレート等の割れ、ずれ、浮き</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">雨樋の設置・固定状況</div>
+                            <div class="text-sm text-gray-600 mt-1">雨樋の割れ、金物の固定状況、ぐらつき</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">軒天・破風の状態</div>
+                            <div class="text-sm text-gray-600 mt-1">軒天ボードの割れ、隙間、換気口の塞がり</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">バルコニー防水・笠木</div>
+                            <div class="text-sm text-gray-600 mt-1">防水層の状態、笠木板金の隙間、排水の流れ</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. 内装・仕上げ -->
+        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-paint-roller text-purple-600 mr-2"></i>
+                    4. 内装・仕上げ
+                </h2>
+                <button onclick="addCustomItem('interior')" class="no-print bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-lg text-blue-600 text-sm transition-colors touch-target">
+                    <i class="fas fa-plus mr-1"></i>項目追加
+                </button>
+            </div>
+            <div id="interior-items" class="space-y-3">
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">床材の傷・へこみ・隙間</div>
+                            <div class="text-sm text-gray-600 mt-1">フローリング、畳、CF等の傷、継ぎ目の隙間</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">壁紙・塗装の仕上がり</div>
+                            <div class="text-sm text-gray-600 mt-1">クロスの浮き、剥がれ、継ぎ目の隙間、塗装のムラ</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">天井の仕上がり</div>
+                            <div class="text-sm text-gray-600 mt-1">クロス、塗装の仕上がり、継ぎ目、シミ・汚れ</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">建具の開閉動作</div>
+                            <div class="text-sm text-gray-600 mt-1">ドア、引き戸、収納扉の開閉、鍵の動作</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-low p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">巾木・回り縁の設置</div>
+                            <div class="text-sm text-gray-600 mt-1">巾木の設置、継ぎ目の仕上がり</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-low p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">床鳴り・きしみ音</div>
+                            <div class="text-sm text-gray-600 mt-1">歩行時の床鳴り、階段のきしみ音</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. 設備・電気 -->
+        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-bolt text-yellow-600 mr-2"></i>
+                    5. 設備・電気
+                </h2>
+                <button onclick="addCustomItem('electrical')" class="no-print bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-lg text-blue-600 text-sm transition-colors touch-target">
+                    <i class="fas fa-plus mr-1"></i>項目追加
+                </button>
+            </div>
+            <div id="electrical-items" class="space-y-3">
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">全照明器具の点灯確認</div>
+                            <div class="text-sm text-gray-600 mt-1">LED、蛍光灯、ダウンライト等の点灯、調光機能</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">全コンセントの通電確認</div>
+                            <div class="text-sm text-gray-600 mt-1">スマホ充電器等で通電確認、アース付きコンセント</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">インターホン・TVモニター</div>
+                            <div class="text-sm text-gray-600 mt-1">インターホンの動作、画質、音質確認</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">換気扇の動作確認</div>
+                            <div class="text-sm text-gray-600 mt-1">各所換気扇の動作、異音の有無、風量</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">火災報知器・ガス警報器</div>
+                            <div class="text-sm text-gray-600 mt-1">設置位置、作動確認（テストボタン）</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-low p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">分電盤・ブレーカー</div>
+                            <div class="text-sm text-gray-600 mt-1">分電盤の設置、回路表示、漏電ブレーカー</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. 水回り -->
+        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-tint text-blue-600 mr-2"></i>
+                    6. 水回り
+                </h2>
+                <button onclick="addCustomItem('plumbing')" class="no-print bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-lg text-blue-600 text-sm transition-colors touch-target">
+                    <i class="fas fa-plus mr-1"></i>項目追加
+                </button>
+            </div>
+            <div id="plumbing-items" class="space-y-3">
+                <div class="priority-high p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">給水・給湯の水圧・水量</div>
+                            <div class="text-sm text-gray-600 mt-1">各蛇口の水圧、お湯の温度と出湯量</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-high p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">排水の流れ・詰まり</div>
+                            <div class="text-sm text-gray-600 mt-1">キッチン、洗面、浴室、トイレの排水状況</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-high p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">配管からの漏水確認</div>
+                            <div class="text-sm text-gray-600 mt-1">キッチン下、洗面台下、床下の配管接続部</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">キッチン設備の動作</div>
+                            <div class="text-sm text-gray-600 mt-1">食洗機、IHコンロ、レンジフード、収納扉</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">浴室・トイレ設備</div>
+                            <div class="text-sm text-gray-600 mt-1">浴室乾燥機、温水洗浄便座、換気扇</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-low p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">水回り付属品の設置</div>
+                            <div class="text-sm text-gray-600 mt-1">タオルハンガー、ペーパーホルダー、棚板</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. 外構・境界 -->
+        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-tree text-green-600 mr-2"></i>
+                    7. 外構・境界
+                </h2>
+                <button onclick="addCustomItem('exterior-works')" class="no-print bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded-lg text-blue-600 text-sm transition-colors touch-target">
+                    <i class="fas fa-plus mr-1"></i>項目追加
+                </button>
+            </div>
+            <div id="exterior-works-items" class="space-y-3">
+                <div class="priority-high p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">境界標の設置確認</div>
+                            <div class="text-sm text-gray-600 mt-1">隣地との境界標（境界杭）の設置、位置</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-high p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">隣地への越境確認</div>
+                            <div class="text-sm text-gray-600 mt-1">屋根、軒、エアコン室外機等の越境がないか</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">外構工事の完成度</div>
+                            <div class="text-sm text-gray-600 mt-1">門扉、フェンス、カーポート、アプローチ</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-medium p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">玄関ポーチ・犬走り</div>
+                            <div class="text-sm text-gray-600 mt-1">タイルの浮き・割れ、コンクリートのひび割れ</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-low p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">立水栓・排水設備</div>
+                            <div class="text-sm text-gray-600 mt-1">立水栓の水量、排水桝の詰まり、勾配</div>
+                        </div>
+                    </label>
+                </div>
+                <div class="priority-low p-4 rounded-lg">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()">
+                        <div>
+                            <div class="font-medium text-gray-800">外部照明・門灯</div>
+                            <div class="text-sm text-gray-600 mt-1">外部照明の点灯、センサーライトの動作</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- 指摘事項記録欄 -->
+        <section class="print-break bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
+                指摘事項記録
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">発見した不具合・気になる点</label>
+                    <textarea id="issues" rows="6" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="例：
+- リビング天井に小さなシミあり（位置：南西角）
+- キッチン下の配管に軽微な水滴
+- 2階トイレのドアが少し重い
+- 外壁南面のシーリングに一部隙間"></textarea>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">検査実施日</label>
+                        <input type="date" id="inspection-date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">立会者</label>
+                        <input type="text" id="attendees" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="例：田中（施主）、佐藤（現場監督）">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">修繕完了予定日・再検査日</label>
+                    <input type="date" id="repair-date" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- フローティングメニュー（スマホ用） -->
+    <div class="no-print fixed bottom-4 right-4 z-50">
+        <div class="bg-white rounded-full shadow-lg border border-gray-200 p-4">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-blue-600" id="floatingProgress">0%</div>
+                <div class="text-xs text-gray-600">完了</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ローカルストレージのキー
+        const STORAGE_KEY = 'kodate_inspection_checklist';
+        
+        // データの保存
+        function saveData() {
+            const data = {
+                checkboxes: {},
+                customItems: {},
+                issues: document.getElementById('issues').value,
+                inspectionDate: document.getElementById('inspection-date').value,
+                attendees: document.getElementById('attendees').value,
+                repairDate: document.getElementById('repair-date').value
+            };
+            
+            // チェックボックスの状態を保存
+            document.querySelectorAll('input[type="checkbox"]').forEach((checkbox, index) => {
+                data.checkboxes[index] = checkbox.checked;
+            });
+            
+            // カスタム項目を保存
+            document.querySelectorAll('.custom-item').forEach((item, index) => {
+                const text = item.querySelector('.custom-item-text');
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const priority = item.classList.contains('priority-high') ? 'high' : 
+                              item.classList.contains('priority-medium') ? 'medium' : 'low';
+                const category = item.closest('[id$="-items"]').id.replace('-items', '');
+                
+                data.customItems[index] = {
+                    text: text.textContent,
+                    checked: checkbox.checked,
+                    priority: priority,
+                    category: category
+                };
+            });
+            
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+        
+        // データの読み込み
+        function loadData() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (!savedData) return;
+            
+            const data = JSON.parse(savedData);
+            
+            // チェックボックスの状態を復元
+            if (data.checkboxes) {
+                document.querySelectorAll('input[type="checkbox"]').forEach((checkbox, index) => {
+                    if (data.checkboxes[index]) {
+                        checkbox.checked = true;
+                    }
+                });
+            }
+            
+            // テキストフィールドを復元
+            if (data.issues) document.getElementById('issues').value = data.issues;
+            if (data.inspectionDate) document.getElementById('inspection-date').value = data.inspectionDate;
+            if (data.attendees) document.getElementById('attendees').value = data.attendees;
+            if (data.repairDate) document.getElementById('repair-date').value = data.repairDate;
+            
+            // カスタム項目を復元
+            if (data.customItems) {
+                Object.values(data.customItems).forEach(item => {
+                    addCustomItemWithData(item.category, item.text, item.priority, item.checked);
+                });
+            }
+            
+            updateProgress();
+        }
+        
+        // 進捗の更新
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const total = checkboxes.length;
+            const completed = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            document.getElementById('totalProgress').textContent = percentage + '%';
+            document.getElementById('floatingProgress').textContent = percentage + '%';
+            document.getElementById('completedItems').textContent = completed;
+            document.getElementById('totalItems').textContent = total;
+            
+            saveData();
+        }
+        
+        // カスタム項目の追加
+        function addCustomItem(category) {
+            const text = prompt('確認項目を入力してください：');
+            if (!text) return;
+            
+            const priorities = ['🔴 最重要', '🟡 重要', '🟢 確認推奨'];
+            const priorityChoice = prompt('重要度を選択してください：\n1: ' + priorities[0] + '\n2: ' + priorities[1] + '\n3: ' + priorities[2]);
+            
+            let priority = 'low';
+            if (priorityChoice === '1') priority = 'high';
+            else if (priorityChoice === '2') priority = 'medium';
+            
+            addCustomItemWithData(category, text, priority, false);
+            updateProgress();
+        }
+        
+        // カスタム項目の追加（データ付き）
+        function addCustomItemWithData(category, text, priority, checked) {
+            const container = document.getElementById(category + '-items');
+            if (!container) return;
+            
+            const item = document.createElement('div');
+            item.className = `custom-item priority-${priority} p-4 rounded-lg`;
+            
+            item.innerHTML = `
+                <label class="flex items-start space-x-3 cursor-pointer">
+                    <input type="checkbox" class="mt-1 touch-target" onchange="updateProgress()" ${checked ? 'checked' : ''}>
+                    <div class="flex-1">
+                        <div class="font-medium text-gray-800 custom-item-text">${text}</div>
+                        <div class="text-sm text-gray-600 mt-1">カスタム項目</div>
+                    </div>
+                    <button onclick="removeCustomItem(this)" class="no-print text-red-500 hover:text-red-700 ml-2 touch-target">
+                        <i class="fas fa-trash text-sm"></i>
+                    </button>
+                </label>
+            `;
+            
+            container.appendChild(item);
+        }
+        
+        // カスタム項目の削除
+        function removeCustomItem(button) {
+            if (confirm('この項目を削除しますか？')) {
+                button.closest('.custom-item').remove();
+                updateProgress();
+            }
+        }
+        
+        // 全データのリセット
+        function resetAll() {
+            if (confirm('すべてのデータをリセットしますか？この操作は取り消せません。')) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+            }
+        }
+        
+        // ページ読み込み時の初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 今日の日付をデフォルトに設定
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('inspection-date').value = today;
+            
+            // データを読み込み
+            loadData();
+            
+            // テキストエリアの変更を監視
+            document.getElementById('issues').addEventListener('input', saveData);
+            document.getElementById('inspection-date').addEventListener('change', saveData);
+            document.getElementById('attendees').addEventListener('input', saveData);
+            document.getElementById('repair-date').addEventListener('change', saveData);
+        });
+        
+        // すべてのチェックボックスにイベントリスナーを追加
+        document.addEventListener('change', function(e) {
+            if (e.target.type === 'checkbox') {
+                updateProgress();
+            }
+        });
+    </script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDprxrz%2F%2BGUIV58fxvmSGFGeI26%2BzyMx4jynuTIl2t%2FL9ZgJlFU7zEqZtIjCAkvJsjBe1wVPU3%2BhJfWujbpil4I54jKRw8J0EZNU5IcfPxcNBf6InKGu3y6ZhKSn15f%2FYZ6ETL3HiLxSvtVzExAvTeF2Tod%2FBbrfe%2Bl6m2XnGzbzv3m4g3pWN4FX8ZC8gBgvT0ZrxgP6sDj4DY6w%2BuRPR8GFzKlkybJuVDT88esLrW744V0fajf%2B32CZJ%2BU8p8x6meAahGV6GOOLh%2FenZIOwXPAjOi1Bihd2ANvlMXWSw9qgoLlt3hJHs09lz7v%2FKQUQ1N7PyCw%2FThGG7ZONSoz5TBpn%2Bua1t7F1Thoak%2FsCfbKQMsudHq3RMmYpgnJRQwQ%2B3ie4xzbSgVpo30IwZoS6SHnYUTDOY%2B0SMbKmofrcqdmqh69KI%2Bqvjd3%2BddgRDupBgZ3mQDy0T8GW331NAdZIUZA5vG%2BTNxRQMF6ec%2BcoYrhZTL67uBV0E8KYHzlybdPBJtA%3D%3D";
+        window.__genspark_locale = "ja-JP";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDprxrz/+GUIV58fxvmSGFGeI26+zyMx4jynuTIl2t/L9ZgJlFU7zEqZtIjCAkvJsjBe1wVPU3+hJfWujbpil4I54jKRw8J0EZNU5IcfPxcNBf6InKGu3y6ZhKSn15f/YZ6ETL3HiLxSvtVzExAvTeF2Tod/Bbrfe+l6m2XnGzbzv3m4g3pWN4FX8ZC8gBgvT0ZrxgP6sDj4DY6w+uRPR8GFzKlkybJuVDT88esLrW744V0fajf+32CZJ+U8p8x6meAahGV6GOOLh/enZIOwXPAjOi1Bihd2ANvlMXWSw9qgoLlt3hJHs09lz7v/KQUQ1N7PyCw/ThGG7ZONSoz5TBpn+ua1t7F1Thoak/sCfbKQMsudHq3RMmYpgnJRQwQ+3ie4xzbSgVpo30IwZoS6SHnYUTDOY+0SMbKmofrcqdmqh69KI+qvjd3+ddgRDupBgZ3mQDy0T8GW331NAdZIUZA5vG+TNxRQMF6ec+coYrhZTL67uBV0E8KYHzlybdPBJtA==";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
